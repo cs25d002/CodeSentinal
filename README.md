@@ -53,8 +53,14 @@ pip install -r requirements.txt      # (fastapi, uvicorn, transformers, torch, t
 ### 3. Frontend/Extension Setup (VSCode)
 
 ```bash
-cd ../extension
-npm install                          # installs vscode, axios, etc.
+cd ../VScodeextension
+# installs vscode, axios, etc.
+# npm install required dependecies
+# open extension.js
+run F5
+for windows: ctrl+shift+p
+for mac: cmd+shift+p
+activate: codesentinal:show panel
 ```
 
 > **Note:** If packaging as a `.vsix`, you can use `npm install -g vsce` then `vsce package`.
