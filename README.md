@@ -127,6 +127,16 @@ sqlite3
 
 ---
 
+## Ressults
+
+![img](Results/FullHuman.jpg)
+
+![img](Results/FullAI.jpg)
+
+![img](Results/Human_AI.jpg)
+
+---
+
 ## 🧑‍🤝‍🧑 Team & Credits
 
 * **Silpa Roy (CS25D002)** — Temporal tracking & typing-speed calculation, SQLite logging, heuristics and handled package.json, and build scripts.
