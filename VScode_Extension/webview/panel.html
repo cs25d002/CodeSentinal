@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CodeSentinel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      background: #1e1e1e;
+      color: #eee;
+    }
+
+    h2 {
+      color: #00e0ff;
+    }
+
+    #stats {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #ddd;
+    }
+
+    #code-container {
+      margin-top: 20px;
+      border: 1px solid #444;
+      padding: 10px;
+      background-color: #111;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .code-line {
+      white-space: pre-wrap;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin: 2px 0;
+    }
+
+    .ai-line {
+      background-color: #3d0000;
+    }
+
+    .human-line {
+      background-color: #003d00;
+    }
+
+    #chart-container {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #222;
+      width: 50%;
+      height: 50%;
+    }
+
+    canvas {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    #error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h2> CodeSentinel </h2>
+  <div id="stats"></div>
+  <div id="error"></div>
+  <div id="code-container"></div>
+
+  <div id="chart-container">
+    <h3>AI vs Human Code</h3>
+    <canvas id="aiPieChart" width="400" height="400"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    window.addEventListener('message', event => {
+      const message = event.data;
+
+      if (message.command === 'showError') {
+        document.getElementById('error').innerText = message.error;
+        return;
+      }
+
+      if (message.command === 'showLineResult') {
+        const { code, lineScores, typingSpeed, codeLength } = message;
+
+        // render typing stats
+        const THRESHOLD = 10; // chars/sec threshold
+        const cls = typingSpeed < THRESHOLD
+                  ? '⚠️ AI-Generated'
+                  : '✅ Human-Written';
+        document.getElementById('stats').innerText =
+          `Speed: ${typingSpeed.toFixed(1)} chars/sec | Length: ${codeLength} chars | ${cls}`;
+
+        const lines = code.split('\n');
+        const codeContainer = document.getElementById('code-container');
+        codeContainer.innerHTML = '';
+
+        let aiCount = 0;
+        let humanCount = 0;
+
+        lines.forEach((line, idx) => {
+          const score = lineScores[idx] || 0;
+          const div = document.createElement('div');
+          div.className = 'code-line';
+          div.innerText = line;
+          const threshold = 0.5;
+          if (score > threshold) {
+            div.classList.add('ai-line');
+            aiCount++;
+          } else {
+            div.classList.add('human-line');
+            humanCount++;
+          }
+
+          codeContainer.appendChild(div);
+        });
+
+        drawPieChart(aiCount, humanCount);
+      }
+    });
+
+    function drawPieChart(aiCount, humanCount) {
+      const ctx = document.getElementById('aiPieChart').getContext('2d');
+      if (window.aiChart) window.aiChart.destroy();
+
+      window.aiChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['AI-Generated', 'Human-Written'],
+          datasets: [{
+            label: 'Code Origin',
+            data: [aiCount, humanCount],
+            backgroundColor: ['#ff4d4f', '#52c41a'],
+            borderColor: '#222',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: { color: '#000' }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
